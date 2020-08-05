@@ -1,2 +1,15 @@
 <% layout('layout') -%>
+
+
 there.....
+<h1 id="uid">trial</h1>
+<a id="problemLink" href="#">cert</a>
+<script>
+    const content = document.cookie.split("=")[1]
+    document.getElementById('uid').innerText = content
+    if(!content){
+        document.getElementById('problemLink').setAttribute('href','/login')
+    }else{
+        document.getElementById('problemLink').setAttribute('href','/cart')
+    }
+</script>

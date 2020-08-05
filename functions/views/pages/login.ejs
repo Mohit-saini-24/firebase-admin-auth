@@ -1,0 +1,90 @@
+<% layout('../layout') %>
+<% stylesheet('https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css') -%>
+<script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.14.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.14.0/firebase-auth.js"></script>
+<script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+loginpage......
+<h1>Welcome to My Awesome App</h1>
+<div id="firebaseui-auth-container"></div>
+<div id="loader">Loading...</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDwkp85irLjwjTYaJiRXX8AX4ROyQ9SmLc",
+        authDomain: "apnakisanbeta.firebaseapp.com"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+
+    // Set persistence to none.
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+    // Initialize the FirebaseUI Widget using Firebase.
+    const ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+    var uiConfig = {
+        callbacks: {
+            signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+
+                firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function (idToken) {
+                    // Send token to your backend via HTTPS
+                    // ...
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            console.log(this.responseText);
+                        }
+                    };
+                    xhttp.open("post", "/cookie", true);
+                    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+                    xhttp.send(`userid=${idToken}`);
+                }).catch(function (error) {
+                    // Handle error
+                    debugger
+                    return error
+                });
+                return true
+            },
+            uiShown: function () {
+                document.getElementById('loader').style.display = 'none';
+            }
+        },
+        // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
+        signInFlow: 'popup',
+        signInSuccessUrl: '/',
+        signInOptions: [
+            {
+                provider: firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+                recaptchaParameters: {
+                    size: 'invisible', // 'invisible' or 'compact'
+                    badge: 'bottomleft' //' bottomright' or 'inline' applies to invisible.
+                },
+                defaultCountry: 'IND',
+                defaultNationalNumber: '',
+                loginHint: '+91'
+            }
+        ],
+
+        // Terms of service url.
+        tosUrl: '<your-tos-url>',
+        // Privacy policy url.
+        privacyPolicyUrl: '<your-privacy-policy-url>'
+    };
+
+    /**
+ * Initializes the app.
+ * 
+ * 
+ */
+
+    function getCookie(name) {
+        const v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+        return v ? v[2] : null;
+    }
+    const initApp = function () {
+        // Renders sign-in page using FirebaseUI.
+        ui.start('#firebaseui-container', getUiConfig());
+    };
+    ui.start('#firebaseui-auth-container', uiConfig);
+
+</script>
